@@ -75,6 +75,12 @@ function getPreWeek() {
             month = date.getMonth();
         }
     }
+    if (week > 1) {
+        week = week - 1;
+    } else {
+        week = 5;
+        month = month - 1;
+    }
     let time = month + "月第" + week + "周";
     return time;
 }
@@ -84,35 +90,33 @@ function getFloorFloat2(price) {
     return Math.floor(price * 100) / 100;
 }
 
-//获取上周总收入
-function getAllMoney(s) {
-    let defer = $.Deferred();
-    $.ajax({
-        url: baseUrl + "/guanggao/shouruList",
-        success: function (result) {
-            let lists = result.data;
-            if (lists === undefined || lists === null || lists.length < 1) {
-                alert("没有查询到数据");
-            } else {
-                allMoney = lists[0].tongchengMoney;
-                defer.resolve(allMoney);
+//获取url里指定的参数
+function getUrlParam(paraName) {
+    var url = document.location.toString();
+    var arrObj = url.split("?");
+    if (arrObj.length > 1) {
+        var arrPara = arrObj[1].split("&");
+        var arr;
+
+        for (var i = 0; i < arrPara.length; i++) {
+            arr = arrPara[i].split("=");
+
+            if (arr != null && arr[0] == paraName) {
+                return decodeURI(arr[1]);
             }
-        },
-        error: function () {
-            defer.reject(10000);
-            // alert("请求失败原因：" + result.responseJSON.message);
-            // return allMoney;
         }
-    });
-    return defer;
-
-
+        return "";
+    } else {
+        return "";
+    }
 }
 
-//定义可以领红包的总点击总量分界线
-function getClickNumLine() {
-    //每周点击量大于下面数字的才能领红包
-    return 10;
-}
+// function getQueryString(name) {
+//     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+//     var r = window.location.search.substr(1).match(reg);
+//     if (r != null) return decodeURI(r[2]);
+//     return null;
+// }
+
 
 

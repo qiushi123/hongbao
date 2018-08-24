@@ -71,7 +71,7 @@
         }
 
         .user_title {
-            width: 150px;
+            width: 250px;
             color: white;
             padding: 3px 0 3px;
             display: inline-block;
@@ -129,35 +129,31 @@
     <li><a href="https://mp.weixin.qq.com/s/lJNXPZxv2bc-_QVGX-eraQ" target="_blank">进红包群规则</a></li>
     <li><a class="selected" href="hongbao.html">红包发送记录</a></li>
     <li><a href="paiming.html">广告点击排名统计</a></li>
+    <li><a href="paimingWeek.html">每周广告排名统计</a></li>
 </ul>
 <br/>
 <!--员工业绩信息-->
 <div>
-    <span class="user_title">广告收入及红包发送记录</span>
+    <span class="user_title">每周广告收入及红包发送记录</span>
     <br>
-    <span class="tips">排名前20名的分前一天广告收入的30%-------------------目前每人差不多能领5元左右的等额红包</span>
-    <span class="tips">排名21-60名分前一天广告收入25%---------------------目前每人差不多能领2.5元左右的等额红包</span>
-    <span class="tips">排名60名以外且点击大于量10的分10%-------------------目前每人能抢0.5元到2元之间的随机红包</span>
-    <span class="tips">每天点击量必须大于10才能领红包，排名越靠前，红包越多。统计截止到24点</span>
+    <span class="tips">每周点击量必须大于50才能领红包，排名越靠前，点击量越多，红包越多。统计截止到周日晚上24点</span>
     <table cellpadding="0" cellspacing="0" id="tabShuJu">
         <tr>
-            <td width="15%" class="line_hidde" bgcolor="#EFEFEF">时间</td>
+            <td width="10%" class="line_hidde" bgcolor="#EFEFEF">时间</td>
             <td width="10%" bgcolor="#EFEFEF">同城跑腿收入</td>
             <td width="10%" bgcolor="#EFEFEF">上门回收收入</td>
-            <td width="15%" bgcolor="#EFEFEF">校园+编程+打泡泡</td>
-            <td width="8%" bgcolor="#EFEFEF">总计（元）</td>
-            <td width="18%" bgcolor="#EFEFEF">前20名红包分配</td>
-            <td width="15%" bgcolor="#EFEFEF">21-60名红包分配</td>
-            <td width="13%" bgcolor="#EFEFEF">60名以外</td>
+            <td width="10%" bgcolor="#EFEFEF">校园跑腿收入</td>
+            <td width="10%" bgcolor="#EFEFEF">编程学习收入</td>
+            <td width="10%" bgcolor="#EFEFEF">打泡泡+飞机大战</td>
+            <td width="10%" bgcolor="#EFEFEF">总计</td>
+            <td width="20%" bgcolor="#EFEFEF">查看分配记录</td>
         </tr>
     </table>
 </div>
 <br/>
 <script>
     // 公用的变量
-    var tabShuJu = document.getElementById("tabShuJu");//员工信息，只有管理员可以修改
-    var startTime = document.getElementById("startTime");//员工信息，只有管理员可以修改
-
+    var tabShuJu = document.getElementById("tabShuJu");
 
     var baseUrl = "http://30paotui.com";
     if (window.location.hostname === "localhost") {
@@ -166,9 +162,11 @@
         baseUrl = "http://30paotui.com";
     }
 
-    getShuJu();
 
-    //查询会员信息
+    getShuJu();
+    let dataListInfo = null;
+
+    //查询收入信息
     function getShuJu() {
         //请求之前清空老数据
         if (tabShuJu.rows.length > 1) {
@@ -178,11 +176,9 @@
             url: baseUrl + "/guanggao/shouruList",
             success: function (result) {
                 var lists = result.data;
-                console.log(lists);
                 if (lists === undefined || lists === null || lists.length < 1) {
                     alert("没有查询到数据");
                 } else {
-                    console.log(lists);
                     showLists(lists);//展示列表信息
                 }
             },
@@ -194,6 +190,7 @@
 
     //把请求到的数据添加到表格中
     function showLists(dataList) {
+        dataListInfo = dataList;
         if (tabShuJu.rows.length > 1) {
             $("#tabHuiYuan  tr:not(:first)").remove();
         }
@@ -207,25 +204,26 @@
 
     //展示信息
     function addRowFromDataList(dataInfo) {
-        var createTime = checkStr(dataInfo.createTime, '--');
+
+        var weekTime = checkStr(dataInfo.weekTime, '--');
         var tongchengMoney = checkStr(dataInfo.tongchengMoney, 0);
         var huishouMoney = checkStr(dataInfo.huishouMoney, 0);
+        var xiaoyuanMoney = checkStr(dataInfo.xiaoyuanMoney, 0);
+        var bianchengMoney = checkStr(dataInfo.bianchengMoney, 0);
         var daqiqiuMoney = checkStr(dataInfo.daqiqiuMoney, 0);
-        var allMoney = tongchengMoney + huishouMoney + daqiqiuMoney;
+        var allMoney = tongchengMoney + huishouMoney + xiaoyuanMoney +
+            +bianchengMoney + daqiqiuMoney;
         allMoney = allMoney.toFixed(2);
-        var bigGroup = checkStr(dataInfo.bigGroup, "待录入");
-        var smallGroup = checkStr(dataInfo.smallGroup, "待录入");
-        var pingjun = checkStr(dataInfo.pingjun, "待录入");
 
         var str = "<tr>" +
-            "<td bgcolor='#FFFFFF' width='15%'class='line_hidde' >" + createTime + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%'class='line_hidde' >" + weekTime + "</td>" +
             "<td bgcolor='#FFFFFF' width='10%'>" + tongchengMoney + "</td>" +
             "<td bgcolor='#FFFFFF' width='10%'>" + huishouMoney + "</td>" +
-            "<td bgcolor='#FFFFFF' width='15%'>" + daqiqiuMoney + "</td>" +
-            "<td bgcolor='#FFFFFF' width='8%' >" + allMoney + "</td>" +
-            "<td bgcolor='#FFFFFF' width='18%' >" + smallGroup + "</td>" +
-            "<td bgcolor='#FFFFFF' width='15%' >" + bigGroup + "</td>" +
-            "<td bgcolor='#FFFFFF' width='13%' >" + pingjun + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%'>" + xiaoyuanMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%' >" + bianchengMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%' >" + daqiqiuMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%' >" + allMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='20%' ><button onclick='toWeekPage(this)'>点击查看红包分配记录</button></td>" +
             "</tr>";
         var lastRow = tabShuJu.rows[tabShuJu.rows.length - 1];
         var newRow = lastRow.cloneNode(true);
@@ -233,18 +231,19 @@
         tabShuJu.tBodies[0].appendChild(newRow);
     }
 
-
-    function clearTime(str) {
-        str = str.replace(/-/g, "");//取消字符串中出现的所有逗号
-        return str;
+    function toWeekPage(event) {
+        let index = event.parentNode.parentNode.rowIndex;
+        console.log({index});
+        if (dataListInfo) {
+            let weekTime = dataListInfo[index - 1].weekTime;
+            console.log({weekTime});
+            window.location.href = "paimingWeek.html?weekTime=" + weekTime;
+        }
     }
-
 
     function checkStr(bean, str) {
         return bean === undefined || bean === null ? str : bean;
     }
-
-
 </script>
 
 
