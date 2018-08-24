@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no, email=no">
+    <meta name="description" content="广告收入及红包发放记录查询">
+    <meta name="keywords" content="广告收入及红包发放记录查询">
+    <!--ajax-->
+    <script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+    <!--标题部位的图标-->
+    <link rel="icon" href="http://img.wezhan.cn/57787_favicon.ico?t=201807091949136502">
+    <link rel="shortcut icon" href="http://img.wezhan.cn/57787_favicon.ico?t=201807091949136502">
+    <link rel="bookmark" href="http://img.wezhan.cn/57787_favicon.ico?t=201807091949136502">
+    <title>广告收入及红包发放记录查询</title>
+    <style type="text/css">
+        /*顶部导航栏*/
+        ul {
+            list-style-type: none;
+            padding: 0;
+            overflow: hidden;
+            width: 82%;
+            margin: 0 auto;
+        }
+
+        li {
+            float: left;
+        }
+
+        a:link, a:visited {
+            display: block;
+            width: 120px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background-color: #55c3ab;;
+            text-align: center;
+            padding: 4px;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        a:active, a:hover {
+            background-color: #0F8988;
+        }
+
+        /*选中的导航栏的样式*/
+        a.selected {
+            background-color: #0F8988;
+        }
+
+        body {
+            font-size: 10pt;
+            line-height: 155%;
+            background: rgb(221, 252, 252);
+            margin: 0;
+            /*background: #55c3ab;*/
+        }
+
+        div {
+            background: white;
+            padding: 0 10px 20px;
+            width: 82%;
+            margin: 0 auto;
+            /*display: flex;*/
+            /*flex-direction: column;*/
+            /*align-items: center;*/
+
+        }
+
+        .user_title {
+            width: 150px;
+            color: white;
+            padding: 3px 0 3px;
+            display: inline-block;
+            text-align: center;
+            background: #0F8988;
+            margin: 30px 10px 10px 5%;
+        }
+
+        .tips {
+            display: inline-block;
+            text-align: center;
+            color: red;
+            margin-left: 5%;
+        }
+
+        /*表格相关*/
+        table {
+            width: 90%;
+            margin: 0 auto;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 0px;
+            border-left-width: 1px;
+            border-top-style: solid;
+            border-right-style: solid;
+            border-bottom-style: none;
+            border-left-style: solid;
+            border-top-color: #CCCCCC;
+            border-right-color: #CCCCCC;
+            border-bottom-color: #CCCCCC;
+            border-left-color: #CCCCCC;
+        }
+
+        td {
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: #CCCCCC;
+            text-align: center;
+            border-left: gray solid 1px;
+        }
+
+        /*隐藏表格第一列分割线*/
+        .line_hidde {
+            border-left: gray solid 0px;
+        }
+    </style>
+
+    <script src="utils.js"></script>
+
+</head>
+<body>
+<!--导航栏-->
+<ul>
+
+    <li><a href="https://mp.weixin.qq.com/s/lJNXPZxv2bc-_QVGX-eraQ" target="_blank">进红包群规则</a></li>
+    <li><a class="selected" href="hongbao.html">红包发送记录</a></li>
+    <li><a href="paiming.html">广告点击排名统计</a></li>
+</ul>
+<br/>
+<!--员工业绩信息-->
+<div>
+    <span class="user_title">广告收入及红包发送记录</span>
+    <br>
+    <span class="tips">排名前20名的分前一天广告收入的30%-------------------目前每人差不多能领5元左右的等额红包</span>
+    <span class="tips">排名21-60名分前一天广告收入25%---------------------目前每人差不多能领2.5元左右的等额红包</span>
+    <span class="tips">排名60名以外且点击大于量10的分10%-------------------目前每人能抢0.5元到2元之间的随机红包</span>
+    <span class="tips">每天点击量必须大于10才能领红包，排名越靠前，红包越多。统计截止到24点</span>
+    <table cellpadding="0" cellspacing="0" id="tabShuJu">
+        <tr>
+            <td width="15%" class="line_hidde" bgcolor="#EFEFEF">时间</td>
+            <td width="10%" bgcolor="#EFEFEF">同城跑腿收入</td>
+            <td width="10%" bgcolor="#EFEFEF">上门回收收入</td>
+            <td width="15%" bgcolor="#EFEFEF">校园+编程+打泡泡</td>
+            <td width="8%" bgcolor="#EFEFEF">总计（元）</td>
+            <td width="18%" bgcolor="#EFEFEF">前20名红包分配</td>
+            <td width="15%" bgcolor="#EFEFEF">21-60名红包分配</td>
+            <td width="13%" bgcolor="#EFEFEF">60名以外</td>
+        </tr>
+    </table>
+</div>
+<br/>
+<script>
+    // 公用的变量
+    var tabShuJu = document.getElementById("tabShuJu");//员工信息，只有管理员可以修改
+    var startTime = document.getElementById("startTime");//员工信息，只有管理员可以修改
+
+
+    var baseUrl = "http://30paotui.com";
+    if (window.location.hostname === "localhost") {
+        baseUrl = "http://localhost:8080";
+    } else {
+        baseUrl = "http://30paotui.com";
+    }
+
+    getShuJu();
+
+    //查询会员信息
+    function getShuJu() {
+        //请求之前清空老数据
+        if (tabShuJu.rows.length > 1) {
+            $("#tabShuJu  tr:not(:first)").remove();
+        }
+        $.ajax({
+            url: baseUrl + "/guanggao/shouruList",
+            success: function (result) {
+                var lists = result.data;
+                console.log(lists);
+                if (lists === undefined || lists === null || lists.length < 1) {
+                    alert("没有查询到数据");
+                } else {
+                    console.log(lists);
+                    showLists(lists);//展示列表信息
+                }
+            },
+            error: function (result) {
+                alert("请求失败原因：" + result.responseJSON.message);
+            }
+        });
+    }
+
+    //把请求到的数据添加到表格中
+    function showLists(dataList) {
+        if (tabShuJu.rows.length > 1) {
+            $("#tabHuiYuan  tr:not(:first)").remove();
+        }
+
+        dataList.forEach(function (data) {
+            addRowFromDataList(data);
+        })
+
+
+    }
+
+    //展示信息
+    function addRowFromDataList(dataInfo) {
+        var createTime = checkStr(dataInfo.createTime, '--');
+        var tongchengMoney = checkStr(dataInfo.tongchengMoney, 0);
+        var huishouMoney = checkStr(dataInfo.huishouMoney, 0);
+        var daqiqiuMoney = checkStr(dataInfo.daqiqiuMoney, 0);
+        var allMoney = tongchengMoney + huishouMoney + daqiqiuMoney;
+        allMoney = allMoney.toFixed(2);
+        var bigGroup = checkStr(dataInfo.bigGroup, "待录入");
+        var smallGroup = checkStr(dataInfo.smallGroup, "待录入");
+        var pingjun = checkStr(dataInfo.pingjun, "待录入");
+
+        var str = "<tr>" +
+            "<td bgcolor='#FFFFFF' width='15%'class='line_hidde' >" + createTime + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%'>" + tongchengMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%'>" + huishouMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='15%'>" + daqiqiuMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='8%' >" + allMoney + "</td>" +
+            "<td bgcolor='#FFFFFF' width='18%' >" + smallGroup + "</td>" +
+            "<td bgcolor='#FFFFFF' width='15%' >" + bigGroup + "</td>" +
+            "<td bgcolor='#FFFFFF' width='13%' >" + pingjun + "</td>" +
+            "</tr>";
+        var lastRow = tabShuJu.rows[tabShuJu.rows.length - 1];
+        var newRow = lastRow.cloneNode(true);
+        newRow.innerHTML = str;
+        tabShuJu.tBodies[0].appendChild(newRow);
+    }
+
+
+    function clearTime(str) {
+        str = str.replace(/-/g, "");//取消字符串中出现的所有逗号
+        return str;
+    }
+
+
+    function checkStr(bean, str) {
+        return bean === undefined || bean === null ? str : bean;
+    }
+
+
+</script>
+
+
+</body>
+</html>
