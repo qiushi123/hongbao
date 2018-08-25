@@ -92,7 +92,7 @@
 
         .tips {
             display: inline-block;
-            text-align: center;
+            /*text-align: center;*/
             color: red;
             margin-left: 5%;
         }
@@ -147,10 +147,15 @@
     <button id="buttonTop2" onclick="clickTime(this)">上周排名及红包分配</button>
 
     <br>
-    <span class="tips">排名前20名的分前一天广告收入的30%-------------------目前每人差不多能领5元左右的等额红包</span>
-    <span class="tips">排名21-60名分前一天广告收入25%---------------------目前每人差不多能领2.5元左右的等额红包</span>
-    <span class="tips">排名60名以外且点击大于量10的分10%-------------------目前每人能抢0.5元到2元之间的随机红包</span>
-    <span class="tips">每天点击量必须大于10才能领红包，排名越靠前，红包越多。统计截止到24点</span>
+    <span class="tips">每周一晚上拿出来上周广告收入的50%给大家发红包，比如上周广告收入1000元,大家总点击量1000
+        大家每次点击量收入0.5元，然后再用0.5元乘以你上周的点击量，就是你的收入了,
+        比如你上周点了100次，那么就相当于你上周可以收入50元红包。大家一定要注意有效点击，只有有效点击率越高，大家的收入才会越高。
+        </span><br>
+    <span class="tips">打泡泡游戏里的视频广告--------------------看完15秒+15次广告点击量</span><br>
+    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习-------点击广告+1次广告点击量</span><br>
+    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习-------关注公号广告+3次广告点击量</span><br>
+
+
     <table cellpadding="0" cellspacing="0" id="tabShuJu">
         <tr>
             <td width="10%" class="line_hidde" bgcolor="#EFEFEF">点击排名</td>
@@ -189,7 +194,6 @@
 
 
     function clickTime(event) {
-        console.log(event.innerHTML);
         selectWeektime(event.innerHTML === "上周排名及红包分配");
     }
 
@@ -229,7 +233,7 @@
                 if (lists === undefined || lists === null || lists.length < 1) {
                     alert("没有查询到数据");
                 } else {
-                    console.log(lists);
+                    // console.log(lists);
                     showLists(lists, isLastWeek);//展示列表信息
                 }
             },
@@ -255,7 +259,6 @@
                 },
                 success: function (result) {
                     var shouRuBean = result.data;
-                    console.log({shouRuBean});
                     if (shouRuBean === undefined || shouRuBean === null) {
                         alert("广告收入还未分配");
                         dataList.forEach(function (data, i) {
@@ -291,6 +294,7 @@
                                 addSumRow(clickSum, allMoney);
                             }
                         });
+                        console.log("分配总金额：" + salarySum)
                     }
                 },
                 error: function (result) {
@@ -307,16 +311,20 @@
     }
 
     //展示信息
+    let salarySum = 0;
+
     function addRowFromDataList(dataInfo, index, clickSumAll, allMoney) {
         // private Integer clickVideoNum;//视频广告点击量
         // private String salary;//每周每人工资
 
         var name = checkStr(dataInfo.name, '空');
+        var salaryStr = checkStr(dataInfo.salary, '未发放');
         var clickNum = checkStr(dataInfo.clickAdNum, 0);
         var salary = "下周一晚8点分配";
         if (clickSumAll > 10) {
             let price = getFloorFloat2(allMoney / clickSumAll) * clickNum;
-            salary = checkStr(getFloorFloat2(price), 0) + "元";
+            salary = checkStr(getFloorFloat2(price), 0) + "元  " + salaryStr;
+            salarySum += checkStr(getFloorFloat2(price), 0);//只统计用
         }
 
         var dateTime = checkStr(dataInfo.weekTime, "");
@@ -334,22 +342,12 @@
         tabShuJu.tBodies[0].appendChild(newRow);
     }
 
-    function add20Row() {
-        var str = "<tr>" +
-            "<th bgcolor='#EFEFEF' colspan='4'class='line_hidde' >排名前20名分界线," +
-            "排名前20名的目前每人差不多能领5元左右的等额红包，加油进入前20吧</th>"
-            + "</tr>";
-        var lastRow = tabShuJu.rows[tabShuJu.rows.length - 1];
-        var newRow = lastRow.cloneNode(true);
-        newRow.innerHTML = str;
-        tabShuJu.tBodies[0].appendChild(newRow);
-    }
-
     //总共点击量
     function addSumRow(clickSum, allMoney) {
         let price = checkStr(getFloorFloat2(allMoney / clickSum), 0);
         var str = "<tr>" +
-            "<td bgcolor='#EFEFEF' colspan='2'class='line_hidde' >总收入:" + allMoney + "元</td>" +
+            "<td bgcolor='#EFEFEF' colspan='2'class='line_hidde' >(分配金额)=总收入*50%=" + allMoney +
+            "元</td>" +
             "<td bgcolor='#EFEFEF' colspan='1' >总点击：" + clickSum + "次</td>" +
             "<td bgcolor='#EFEFEF' colspan='2' >每次点击金额：" + price + "元</td>" +
             "</tr>";
