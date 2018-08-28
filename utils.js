@@ -43,51 +43,63 @@ function getYesterday() {
     return clearTime(time);
 }
 
-//获取当前日前属于第几周
-function getWeek() {
-    // 将字符串转为标准时间格式
-    var date = new Date();
-    // 先计算出该日期为第几周
-    let week = Math.ceil(date.getDate() / 7);
-    let month = date.getMonth() + 1;
-    // 判断这个月前7天是周几，如果不是周一，则计入上个月
-    if (date.getDate() < 7) {
-        if (date.getDay() !== 1) {
-            week = 5;
-            month = date.getMonth();
-        }
-    }
-    let time = month + "月第" + week + "周";
-    return time;
-}
-
 //获取上周
 function getPreWeek() {
-    // 将字符串转为标准时间格式
-    var date = new Date();
-    // 先计算出该日期为第几周
-    let week = Math.ceil(date.getDate() / 7);
+    let date = new Date();
     let month = date.getMonth() + 1;
-    // 判断这个月前7天是周几，如果不是周一，则计入上个月
-    if (date.getDate() < 7) {
-        if (date.getDay() !== 1) {
-            week = 5;
-            month = date.getMonth();
-        }
+    let week = getWeekFromDate(date);
+    if (week === 0) {//第0周归于上月的最后一周
+        month = date.getMonth();
+        let dateLast = new Date();
+        let dayLast = new Date(dateLast.getFullYear(), dateLast.getMonth(), 0).getDate();
+        let timestamp = new Date(new Date().getFullYear(), new Date().getMonth() - 1, dayLast);
+        week = getWeekFromDate(new Date(timestamp));
     }
     if (week > 1) {
         week = week - 1;
     } else {
-        week = 5;
+        week = 4;
         month = month - 1;
     }
     let time = month + "月第" + week + "周";
     return time;
 }
 
+//获取今天是本月第几周
+function getWeek() {
+    // 将字符串转为标准时间格式
+    let date = new Date();
+    let month = date.getMonth() + 1;
+    let week = getWeekFromDate(date);
+    if (week === 0) {//第0周归于上月的最后一周
+        month = date.getMonth();
+        let dateLast = new Date();
+        let dayLast = new Date(dateLast.getFullYear(), dateLast.getMonth(), 0).getDate();
+        let timestamp = new Date(new Date().getFullYear(), new Date().getMonth() - 1, dayLast);
+        week = getWeekFromDate(new Date(timestamp));
+    }
+    let time = month + "月第" + week + "周";
+    return time;
+}
+
+function getWeekFromDate(date) {
+    // 将字符串转为标准时间格式
+    let w = date.getDay();//周几
+    if (w === 0) {
+        w = 7;
+    }
+    let week = Math.ceil((date.getDate() + 6 - w) / 7) - 1;
+    return week;
+}
+
 //保留两位小数点，向下
 function getFloorFloat2(price) {
     return Math.floor(price * 100) / 100;
+}
+
+//保留两位小数点，向下
+function getFloorFloat6(price) {
+    return Math.floor(price * 1000000) / 1000000;
 }
 
 //获取url里指定的参数

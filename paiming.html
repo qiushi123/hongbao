@@ -7,15 +7,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no, email=no">
-    <meta name="description" content="广告点击排名统计">
-    <meta name="keywords" content="广告点击排名统计">
+    <meta name="description" content="每周广告点击排名统计">
+    <meta name="keywords" content="每周广告点击排名统计">
     <!--ajax-->
     <script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
     <!--标题部位的图标-->
     <link rel="icon" href="http://img.wezhan.cn/57787_favicon.ico?t=201807091949136502">
     <link rel="shortcut icon" href="http://img.wezhan.cn/57787_favicon.ico?t=201807091949136502">
     <link rel="bookmark" href="http://img.wezhan.cn/57787_favicon.ico?t=201807091949136502">
-    <title>广告点击排名统计</title>
+    <title>每周广告点击排名统计</title>
     <style type="text/css">
         /*顶部导航栏*/
         ul {
@@ -137,30 +137,30 @@
 <ul>
     <li><a href="https://mp.weixin.qq.com/s/lJNXPZxv2bc-_QVGX-eraQ" target="_blank">进红包群规则</a></li>
     <li><a href="hongbao.html">红包发送记录</a></li>
-    <li><a class="selected" href="paiming.html">每日广告点击排名</a></li>
-    <li><a href="paimingWeek.html">每周广告排名统计</a></li>
+    <li><a class="selected" href="paiming.html">每周广告排名统计</a></li>
 </ul>
 <br/>
 <!--员工业绩信息-->
 <div>
-    <button id="buttonTop1" onclick="clickTime(this)">今日排名</button>
-    <button id="buttonTop2" onclick="clickTime(this)">昨日排名</button>
+    <button id="buttonTop1" onclick="clickTime(this)">本周排名</button>
+    <button id="buttonTop2" onclick="clickTime(this)">上周排名及红包分配</button>
 
-    <br>
     <br>
     <span class="tips">每周一晚上拿出来上周广告收入的50%给大家发红包，比如上周广告收入1000元,大家总点击量1000
         大家每次点击量收入0.5元，然后再用0.5元乘以你上周的点击量，就是你的收入了,
         比如你上周点了100次，那么就相当于你上周可以收入50元红包。大家一定要注意有效点击，只有有效点击率越高，大家的收入才会越高。
         </span><br>
-    <span class="tips">打泡泡游戏里的视频广告--------------------看完15秒+15次广告点击量</span><br>
-    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习-------点击广告+1次广告点击量</span><br>
-    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习-------关注公号广告+3次广告点击量</span><br>
+    <span class="tips">打泡泡游戏------------------ 视频广告看完15秒 +10次广告点击量</span><br>
+    <span class="tips">打泡泡，飞机大战小游戏---------分享到微信群 +3次广告点击量</span><br>
+    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习------点击广告 +1次广告点击量</span><br>
+    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习------关注广告里的公众号 +3次广告点击量</span><br>
 
     <table cellpadding="0" cellspacing="0" id="tabShuJu">
         <tr>
-            <td width="20%" class="line_hidde" bgcolor="#EFEFEF">点击排名</td>
+            <td width="10%" class="line_hidde" bgcolor="#EFEFEF">点击排名</td>
             <td width="20%" bgcolor="#EFEFEF">姓名</td>
             <td width="20%" bgcolor="#EFEFEF">广告点击量</td>
+            <td width="20%" bgcolor="#EFEFEF">红包分配</td>
             <td width="20%" bgcolor="#EFEFEF">时间</td>
 
         </tr>
@@ -169,9 +169,9 @@
 <br/>
 <script>
     // 公用的变量
-    var tabShuJu = document.getElementById("tabShuJu");//员工信息，只有管理员可以修改
-    var buttonTop1 = document.getElementById("buttonTop1");//今天
-    var buttonTop2 = document.getElementById("buttonTop2");//昨天
+    var tabShuJu = document.getElementById("tabShuJu");//数据表格
+    var buttonTop1 = document.getElementById("buttonTop1");//本周
+    var buttonTop2 = document.getElementById("buttonTop2");//上周
 
 
     var baseUrl = "http://30paotui.com";
@@ -181,16 +181,28 @@
         baseUrl = "http://30paotui.com";
     }
 
-    getShuJu(getDay());
+    //从红包发送记录跳过来
+    let lastWeekTime = getUrlParam('weekTime');
+    console.log({lastWeekTime});
+    if (lastWeekTime) {
+        selectWeektime(true);
+    } else {
+        selectWeektime(false);
+        lastWeekTime = getPreWeek();
+    }
+
 
     function clickTime(event) {
-        console.log(event.innerHTML);
-        if (event.innerHTML === "昨日排名") {
-            getShuJu(getYesterday());
+        selectWeektime(event.innerHTML === "上周排名及红包分配");
+    }
+
+    function selectWeektime(isLastWeek) {
+        if (isLastWeek) {
+            getShuJu(lastWeekTime, true);
             buttonTop1.style.background = "#55c3ab";
             buttonTop2.style.background = "#0F8988";
         } else {
-            getShuJu(getDay());
+            getShuJu(getWeek(), false);
             buttonTop1.style.background = "#0F8988";
             buttonTop2.style.background = "#55c3ab";
         }
@@ -198,25 +210,30 @@
     }
 
     //查询会员信息
-    function getShuJu(day) {
+    function getShuJu(weekTime, isLastWeek) {
+        console.log({weekTime});
+        //请求之前清空老数据
+        if (tabShuJu.rows.length > 1) {
+            $("#tabShuJu  tr:not(:first)").remove();
+        }
+
         //请求之前清空老数据
         if (tabShuJu.rows.length > 1) {
             $("#tabShuJu  tr:not(:first)").remove();
         }
         $.ajax({
-            url: baseUrl + "/guanggao/clikcList",
+            url: baseUrl + "/guanggao/clickWeekList",
             type: "post",
             data: {
-                "dateTime": day,
+                "weekTime": weekTime,
             },
             success: function (result) {
                 var lists = result.data;
-                console.log(lists);
                 if (lists === undefined || lists === null || lists.length < 1) {
                     alert("没有查询到数据");
                 } else {
-                    console.log(lists);
-                    showLists(lists);//展示列表信息
+                    // console.log(lists);
+                    showLists(lists, isLastWeek);//展示列表信息
                 }
             },
             error: function (result) {
@@ -226,33 +243,100 @@
     }
 
     //把请求到的数据添加到表格中
-    function showLists(dataList) {
+
+    function showLists(dataList, isLastWeek) {
         if (tabShuJu.rows.length > 1) {
             $("#tabHuiYuan  tr:not(:first)").remove();
         }
+        if (isLastWeek) {
+            //获取上周日期对应的收入
+            $.ajax({
+                url: baseUrl + "/guanggao/shouruOneWeek",
+                type: "post",
+                data: {
+                    "weekTime": clearTime(lastWeekTime),
+                },
+                success: function (result) {
+                    var shouRuBean = result.data;
+                    if (shouRuBean === undefined || shouRuBean === null) {
+                        alert("广告收入还未分配");
+                        dataList.forEach(function (data, i) {
+                            addRowFromDataList(data, i + 1, 0, 0);
+                        });
+                    } else {
+                        salarySum = 0;
+                        console.log(shouRuBean);
+                        let newDataList = [];
+                        let clickSum = 0;
+                        let clickNumLine = shouRuBean.fengexian;
 
-        dataList.forEach(function (data, i) {
-            addRowFromDataList(data, i + 1);
-            if (i + 1 === 20) {
-                add20Row();
-            } else if (i + 1 === 60) {
-                add21_60Row();
-            }
-        })
+                        //只有每周总结点击量大于clickNumLine的才能分配利润
+                        dataList.forEach(function (data, i) {
+                            if (data && data.clickAdNum > clickNumLine) {
+                                newDataList.push(data);
+                                clickSum += data.clickAdNum;
+                            }
+                        });
+
+
+                        let allMoney =
+                            checkStr(shouRuBean.tongchengMoney, 0)
+                            + checkStr(shouRuBean.huishouMoney, 0)
+                            + checkStr(shouRuBean.xiaoyuanMoney, 0)
+                            + checkStr(shouRuBean.bianchengMoney, 0)
+                            + checkStr(shouRuBean.daqiqiuMoney, 0);
+                        //分成50%
+                        allMoney = getFloorFloat2(allMoney / 2);
+                        //最后一行写出总点击量
+                        newDataList.forEach(function (data, i) {
+                            addRowFromDataList(data, i + 1, clickSum, allMoney);
+                            if (i >= newDataList.length - 1 && clickSum > 0) {
+                                addSumRow(clickSum, allMoney);
+                            }
+                        });
+                        console.log("分配总金额：" + salarySum)
+                    }
+                },
+                error: function (result) {
+                    alert("请求失败原因：" + result.responseJSON.message);
+                }
+            });
+        } else {
+            dataList.forEach(function (data, i) {
+                addRowFromDataList(data, i + 1, 0, 0);
+            });
+        }
 
 
     }
 
     //展示信息
-    function addRowFromDataList(dataInfo, index) {
+    let salarySum = 0;
+
+    function addRowFromDataList(dataInfo, index, clickSumAll, allMoney) {
+        // private Integer clickVideoNum;//视频广告点击量
+        // private String salary;//每周每人工资
+
+        var clickNum = checkStr(dataInfo.clickAdNum, 1);
+        if (clickNum < 1) {
+            return;
+        }
         var name = checkStr(dataInfo.name, '空');
-        var clickNum = checkStr(dataInfo.clickNum, 0);
-        var dateTime = checkStr(dataInfo.dateTime, "");
+        var salaryStr = checkStr(dataInfo.salary, '未发放');
+        var salary = "下周一晚8点分配";
+        if (clickSumAll > 10) {
+            let price = getFloorFloat6(allMoney / clickSumAll) * clickNum;
+            salary = checkStr(getFloorFloat2(price), 0) + "元  " + salaryStr;
+            salarySum += checkStr(getFloorFloat2(price), 0);//只统计用
+        }
+
+        var dateTime = checkStr(dataInfo.weekTime, "");
 
         var str = "<tr>" +
-            "<td bgcolor='#FFFFFF' width='20%'class='line_hidde' >" + index + "</td>" +
+            "<td bgcolor='#FFFFFF' width='10%'class='line_hidde' >" + index + "</td>" +
             "<td bgcolor='#FFFFFF' width='20%' >" + name + "</td>" +
             "<td bgcolor='#FFFFFF' width='20%'>" + clickNum + "</td>" +
+            "<td bgcolor='#FFFFFF' width='20%' >" + salary + "</td>" +
             "<td bgcolor='#FFFFFF' width='20%'>" + dateTime + "</td>" +
             "</tr>";
         var lastRow = tabShuJu.rows[tabShuJu.rows.length - 1];
@@ -261,22 +345,15 @@
         tabShuJu.tBodies[0].appendChild(newRow);
     }
 
-    function add20Row() {
+    //总共点击量
+    function addSumRow(clickSum, allMoney) {
+        let price = checkStr(getFloorFloat6(allMoney / clickSum), 0);
         var str = "<tr>" +
-            "<th bgcolor='#EFEFEF' colspan='4'class='line_hidde' >排名前20名分界线," +
-            "排名前20名的目前每人差不多能领5元左右的等额红包，加油进入前20吧</th>"
-            + "</tr>";
-        var lastRow = tabShuJu.rows[tabShuJu.rows.length - 1];
-        var newRow = lastRow.cloneNode(true);
-        newRow.innerHTML = str;
-        tabShuJu.tBodies[0].appendChild(newRow);
-    }
-
-    function add21_60Row() {
-        var str = "<tr>" +
-            "<th bgcolor='#EFEFEF' colspan='4'class='line_hidde' >排名前21-60名分界线," +
-            "排名前21--60名且点击量大于10的目前每人差不多能领2.5元左右的等额红包，加油进入前60吧,进入前20红包更多奥</th>"
-            + "</tr>";
+            "<td bgcolor='#EFEFEF' colspan='2'class='line_hidde' >(分配金额)=总收入*50%=" + allMoney +
+            "元</td>" +
+            "<td bgcolor='#EFEFEF' colspan='1' >总点击：" + clickSum + "次</td>" +
+            "<td bgcolor='#EFEFEF' colspan='2' >每次点击金额：" + price + "元</td>" +
+            "</tr>";
         var lastRow = tabShuJu.rows[tabShuJu.rows.length - 1];
         var newRow = lastRow.cloneNode(true);
         newRow.innerHTML = str;

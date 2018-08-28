@@ -128,8 +128,7 @@
 
     <li><a href="https://mp.weixin.qq.com/s/lJNXPZxv2bc-_QVGX-eraQ" target="_blank">进红包群规则</a></li>
     <li><a class="selected" href="hongbao.html">红包发送记录</a></li>
-    <li><a href="paiming.html">广告点击排名统计</a></li>
-    <li><a href="paimingWeek.html">每周广告排名统计</a></li>
+    <li><a href="paiming.html">每周广告排名统计</a></li>
 </ul>
 <br/>
 <!--员工业绩信息-->
@@ -140,9 +139,10 @@
         大家每次点击量收入0.5元，然后再用0.5元乘以你上周的点击量，就是你的收入了,
         比如你上周点了100次，那么就相当于你上周可以收入50元红包。大家一定要注意有效点击，只有有效点击率越高，大家的收入才会越高。
         </span><br>
-    <span class="tips">打泡泡游戏里的视频广告--------------------看完15秒+15次广告点击量</span><br>
-    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习-------点击广告+1次广告点击量</span><br>
-    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习-------关注公号广告+3次广告点击量</span><br>
+    <span class="tips">打泡泡游戏------------------ 视频广告看完15秒 +10次广告点击量</span><br>
+    <span class="tips">打泡泡，飞机大战小游戏---------分享到微信群 +3次广告点击量</span><br>
+    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习------点击广告 +1次广告点击量</span><br>
+    <span class="tips">上门回收，同城跑腿，校园跑腿，编程学习------关注广告里的公众号 +3次广告点击量</span><br>
 
     <table cellpadding="0" cellspacing="0" id="tabShuJu">
         <tr>
@@ -244,7 +244,7 @@
         if (dataListInfo) {
             let weekTime = dataListInfo[index - 1].weekTime;
             console.log({weekTime});
-            window.location.href = "paimingWeek.html?weekTime=" + weekTime;
+            window.location.href = "paiming.html?weekTime=" + weekTime;
         }
     }
 
